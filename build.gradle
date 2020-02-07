@@ -267,3 +267,46 @@ if (!JavaVersion.current().isJava9Compatible()) {
         |""".stripMargin()
     )
 }
+
+apply plugin: 'maven-publish'   
+ 
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+ 
+publishing {
+   publications {
+      mavenJava(MavenPublication) {
+          groupId 'org.mongodb'
+          artifactId 'mongodb-drive'
+          version '3.12.1.redhat-00001'
+          from components.java
+ 
+          artifact sourcesJar
+ 
+          pom {
+                name = 'Library Name'
+                description = 'Library Description'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+            }
+        }
+      }
+      repositories {
+        maven {
+            url System.getProperty('AProxDeployUrl')
+            credentials(HttpHeaderCredentials) {
+                name = "Authorization"
+                value = "Bearer " + System.getProperty('accessToken')
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+        }
+     }
+  }
+}
